@@ -61,6 +61,17 @@ Respond with JSON in this exact format:
     };
   } catch (error) {
     console.error("OpenAI API error:", error);
+    
+    // Handle specific OpenAI API errors
+    if (error instanceof Error) {
+      if (error.message.includes('429') || error.message.includes('quota')) {
+        throw new Error("OpenAI API quota exceeded. Please add credits to your OpenAI account at platform.openai.com/settings/organization/billing");
+      }
+      if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+        throw new Error("Invalid OpenAI API key. Please check your API key configuration.");
+      }
+    }
+    
     throw new Error("Failed to generate poem: " + (error as Error).message);
   }
 }
