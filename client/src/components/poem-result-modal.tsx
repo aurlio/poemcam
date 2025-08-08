@@ -5,11 +5,12 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { t, type Language } from "@/lib/translations";
 
 interface PoemResultModalProps {
   isOpen: boolean;
   poem: Poem | null;
-  language: 'en' | 'zh';
+  language: Language;
   onClose: () => void;
   onGenerateAnother: () => void;
 }
@@ -29,14 +30,14 @@ export function PoemResultModal({ isOpen, poem, language, onClose, onGenerateAno
       setIsFavorite(updatedPoem.isFavorite);
       queryClient.invalidateQueries({ queryKey: ['/api/poems'] });
       toast({
-        title: updatedPoem.isFavorite ? "Added to Favorites" : "Removed from Favorites",
-        description: updatedPoem.isFavorite ? "Poem saved to your favorites." : "Poem removed from favorites.",
+        title: updatedPoem.isFavorite ? t(language, 'addedToFavorites') : t(language, 'removedFromFavorites'),
+        description: updatedPoem.isFavorite ? t(language, 'poemSavedToFavorites') : t(language, 'poemRemovedFromFavorites'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update favorite status.",
+        title: t(language, 'error'),
+        description: t(language, 'failedToUpdateFavorite'),
         variant: "destructive",
       });
     }
@@ -62,13 +63,13 @@ export function PoemResultModal({ isOpen, poem, language, onClose, onGenerateAno
       try {
         await navigator.clipboard.writeText(shareText);
         toast({
-          title: "Copied to Clipboard",
-          description: "Poem copied to clipboard for sharing.",
+          title: t(language, 'copiedToClipboard'),
+          description: t(language, 'poemCopiedToClipboard'),
         });
       } catch (error) {
         toast({
-          title: "Error",
-          description: "Failed to copy poem to clipboard.",
+          title: t(language, 'error'),
+          description: t(language, 'failedToCopyToClipboard'),
           variant: "destructive",
         });
       }
@@ -88,8 +89,8 @@ export function PoemResultModal({ isOpen, poem, language, onClose, onGenerateAno
       <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white" data-testid="text-poem-title">
-            Your Poem
+          <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${language === 'zh' ? 'chinese-text' : ''}`} data-testid="text-poem-title">
+            {t(language, 'yourPoem')}
           </h3>
           <Button
             variant="ghost"
@@ -127,31 +128,31 @@ export function PoemResultModal({ isOpen, poem, language, onClose, onGenerateAno
           <div className="space-y-3">
             <Button
               onClick={handleShare}
-              className="w-full bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
+              className={`w-full bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors ${language === 'zh' ? 'chinese-text' : ''}`}
               data-testid="button-share-poem"
             >
               <Share2 className="w-5 h-5 mr-2" />
-              Share Poem
+              {t(language, 'sharePoem')}
             </Button>
             
             <Button
               onClick={handleFavorite}
               variant="outline"
-              className="w-full py-3 rounded-xl font-medium transition-colors"
+              className={`w-full py-3 rounded-xl font-medium transition-colors ${language === 'zh' ? 'chinese-text' : ''}`}
               disabled={favoriteMutation.isPending}
               data-testid="button-favorite-poem"
             >
               <Heart className={`w-5 h-5 mr-2 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
-              {isFavorite ? 'Remove from Favorites' : 'Save to Favorites'}
+              {isFavorite ? t(language, 'removeFromFavorites') : t(language, 'saveToFavorites')}
             </Button>
             
             <Button
               onClick={onGenerateAnother}
-              className="w-full bg-secondary text-white py-3 rounded-xl font-medium hover:bg-secondary/90 transition-colors"
+              className={`w-full bg-secondary text-white py-3 rounded-xl font-medium hover:bg-secondary/90 transition-colors ${language === 'zh' ? 'chinese-text' : ''}`}
               data-testid="button-generate-another"
             >
               <Shuffle className="w-5 h-5 mr-2" />
-              Generate Another Style
+              {t(language, 'generateAnotherStyle')}
             </Button>
           </div>
         </div>

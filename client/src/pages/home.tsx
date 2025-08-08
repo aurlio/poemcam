@@ -10,6 +10,7 @@ import { LoadingModal } from "@/components/loading-modal";
 import { PoemResultModal } from "@/components/poem-result-modal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { t, type Language } from "@/lib/translations";
 
 export default function Home() {
   const [language, setLanguage] = useState<'en' | 'zh'>('en');
@@ -51,8 +52,8 @@ export default function Home() {
     onError: (error) => {
       setIsLoading(false);
       toast({
-        title: "Error",
-        description: "Failed to generate poem. Please try again.",
+        title: t(language, 'error'),
+        description: t(language, 'failedToGeneratePoem'),
         variant: "destructive",
       });
     }
@@ -66,8 +67,8 @@ export default function Home() {
       createPoemMutation.mutate(file);
     } catch (error) {
       toast({
-        title: "Camera Error",
-        description: "Failed to capture photo. Please try again.",
+        title: t(language, 'cameraError'),
+        description: t(language, 'failedToCapturePhoto'),
         variant: "destructive",
       });
     }
@@ -86,8 +87,8 @@ export default function Home() {
       await openCamera();
     } catch (error) {
       toast({
-        title: "Camera Access Denied",
-        description: "Please allow camera access to take photos.",
+        title: t(language, 'cameraAccessDenied'),
+        description: t(language, 'allowCameraAccess'),
         variant: "destructive",
       });
     }
@@ -95,7 +96,7 @@ export default function Home() {
 
   const handleShare = async (poem: Poem) => {
     const currentPoem = language === 'zh' ? poem.poemChinese : poem.poemEnglish;
-    const shareText = `${currentPoem}\n\nCreated with PoemLens - AI Poetry from Photos`;
+    const shareText = `${currentPoem}\n\nCreated with ${t(language, 'appTitle')} - AI Poetry from Photos`;
 
     if (navigator.share) {
       try {
@@ -110,13 +111,13 @@ export default function Home() {
       try {
         await navigator.clipboard.writeText(shareText);
         toast({
-          title: "Copied to Clipboard",
-          description: "Poem copied to clipboard for sharing.",
+          title: t(language, 'copiedToClipboard'),
+          description: t(language, 'poemCopiedToClipboard'),
         });
       } catch (error) {
         toast({
-          title: "Error",
-          description: "Failed to copy poem to clipboard.",
+          title: t(language, 'error'),
+          description: t(language, 'failedToCopyToClipboard'),
           variant: "destructive",
         });
       }
@@ -129,9 +130,9 @@ export default function Home() {
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInHours / 24);
 
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    if (diffInHours < 1) return t(language, 'justNow');
+    if (diffInHours < 24) return t(language, 'hoursAgo', diffInHours);
+    return t(language, 'daysAgo', diffInDays);
   };
 
   return (
@@ -144,7 +145,7 @@ export default function Home() {
               <Camera className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white" data-testid="text-app-title">
-              PoemLens
+              {t(language, 'appTitle')}
             </h1>
           </div>
           
@@ -179,18 +180,18 @@ export default function Home() {
           <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center">
             <BookOpen className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2" data-testid="text-welcome-title">
-            Create Poetry from Photos
+          <h2 className={`text-2xl font-semibold text-gray-900 dark:text-white mb-2 ${language === 'zh' ? 'chinese-text' : ''}`} data-testid="text-welcome-title">
+            {t(language, 'welcomeTitle')}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 leading-relaxed" data-testid="text-welcome-description">
-            Take a photo or upload an image, and our AI will craft a beautiful poem inspired by what it sees.
+          <p className={`text-gray-600 dark:text-gray-400 leading-relaxed ${language === 'zh' ? 'chinese-text' : ''}`} data-testid="text-welcome-description">
+            {t(language, 'welcomeDescription')}
           </p>
         </div>
 
         {/* Recent Poems Section */}
         <div className="px-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4" data-testid="text-recent-poems-title">
-            Recent Creations
+          <h3 className={`text-lg font-semibold text-gray-900 dark:text-white mb-4 ${language === 'zh' ? 'chinese-text' : ''}`} data-testid="text-recent-poems-title">
+            {t(language, 'recentCreationsTitle')}
           </h3>
           
           {poemsLoading ? (
@@ -203,8 +204,8 @@ export default function Home() {
             </div>
           ) : poems.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400" data-testid="text-no-poems">
-                No poems yet. Create your first poem by taking a photo!
+              <p className={`text-gray-500 dark:text-gray-400 ${language === 'zh' ? 'chinese-text' : ''}`} data-testid="text-no-poems">
+                {t(language, 'noPoemsMessage')}
               </p>
             </div>
           ) : (
@@ -236,11 +237,11 @@ export default function Home() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleShare(poem)}
-                        className="hover:text-primary transition-colors"
+                        className={`hover:text-primary transition-colors ${language === 'zh' ? 'chinese-text' : ''}`}
                         data-testid={`button-share-${poem.id}`}
                       >
                         <Share2 className="w-4 h-4 mr-1" />
-                        Share
+                        {t(language, 'share')}
                       </Button>
                     </div>
                   </CardContent>
@@ -250,10 +251,10 @@ export default function Home() {
               {poems.length > 3 && (
                 <Button 
                   variant="outline" 
-                  className="w-full py-3 rounded-xl"
+                  className={`w-full py-3 rounded-xl ${language === 'zh' ? 'chinese-text' : ''}`}
                   data-testid="button-view-all-poems"
                 >
-                  View All Poems
+                  {t(language, 'viewAllPoems')}
                 </Button>
               )}
             </div>
@@ -262,8 +263,8 @@ export default function Home() {
 
         {/* How It Works Section */}
         <div className="px-6 py-8 bg-gray-50 dark:bg-gray-800 mx-4 rounded-xl">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 text-center" data-testid="text-how-it-works-title">
-            How It Works
+          <h3 className={`text-lg font-semibold text-gray-900 dark:text-white mb-6 text-center ${language === 'zh' ? 'chinese-text' : ''}`} data-testid="text-how-it-works-title">
+            {t(language, 'howItWorksTitle')}
           </h3>
           <div className="space-y-4">
             <div className="flex items-start space-x-4">
@@ -271,8 +272,8 @@ export default function Home() {
                 1
               </div>
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Capture or Upload</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Take a photo with your camera or upload from your gallery</p>
+                <h4 className={`font-medium text-gray-900 dark:text-white ${language === 'zh' ? 'chinese-text' : ''}`}>{t(language, 'step1Title')}</h4>
+                <p className={`text-sm text-gray-600 dark:text-gray-400 ${language === 'zh' ? 'chinese-text' : ''}`}>{t(language, 'step1Description')}</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
@@ -280,8 +281,8 @@ export default function Home() {
                 2
               </div>
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">AI Analysis</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Our AI analyzes the image and understands its essence</p>
+                <h4 className={`font-medium text-gray-900 dark:text-white ${language === 'zh' ? 'chinese-text' : ''}`}>{t(language, 'step2Title')}</h4>
+                <p className={`text-sm text-gray-600 dark:text-gray-400 ${language === 'zh' ? 'chinese-text' : ''}`}>{t(language, 'step2Description')}</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
@@ -289,8 +290,8 @@ export default function Home() {
                 3
               </div>
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Poetry Creation</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Receive a beautiful poem in English or Chinese</p>
+                <h4 className={`font-medium text-gray-900 dark:text-white ${language === 'zh' ? 'chinese-text' : ''}`}>{t(language, 'step3Title')}</h4>
+                <p className={`text-sm text-gray-600 dark:text-gray-400 ${language === 'zh' ? 'chinese-text' : ''}`}>{t(language, 'step3Description')}</p>
               </div>
             </div>
           </div>
@@ -304,21 +305,21 @@ export default function Home() {
             {/* Camera Button */}
             <Button
               onClick={handleCameraOpen}
-              className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl py-4 px-6 font-semibold shadow-lg transition-all"
+              className={`flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl py-4 px-6 font-semibold shadow-lg transition-all ${language === 'zh' ? 'chinese-text' : ''}`}
               data-testid="button-camera"
             >
               <Camera className="w-5 h-5 mr-2" />
-              Take Photo
+              {t(language, 'takePhoto')}
             </Button>
             
             {/* Upload Button */}
             <Button
               onClick={() => fileInputRef.current?.click()}
-              className="flex-1 bg-secondary hover:bg-secondary/90 text-white rounded-xl py-4 px-6 font-semibold shadow-lg transition-all"
+              className={`flex-1 bg-secondary hover:bg-secondary/90 text-white rounded-xl py-4 px-6 font-semibold shadow-lg transition-all ${language === 'zh' ? 'chinese-text' : ''}`}
               data-testid="button-upload"
             >
               <Upload className="w-5 h-5 mr-2" />
-              Upload
+              {t(language, 'upload')}
             </Button>
           </div>
         </div>
@@ -343,7 +344,7 @@ export default function Home() {
         onFlip={flipCamera}
       />
 
-      <LoadingModal isOpen={isLoading} />
+      <LoadingModal isOpen={isLoading} language={language} />
 
       <PoemResultModal
         isOpen={!!selectedPoem}
