@@ -67,3 +67,4 @@ Preferred communication style: Simple, everyday language.
 - **Service Worker**: Custom caching strategy for offline functionality
 - **Web App Manifest**: PWA configuration for installation and app-like behavior
 - **Responsive Design**: Mobile-first approach with touch-optimized interactions
+- **Deployment**: Complete nginx deployment guide with HTTPS, security headers, and production configuration
